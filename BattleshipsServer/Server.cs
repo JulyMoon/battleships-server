@@ -66,7 +66,9 @@ namespace BattleshipsServer
                     message = $"{player.Name}: {data}";
                     break;
 
-                default: throw new ArgumentException("Invalid data");
+                default: //throw new ArgumentException("Invalid data");
+                    message = $"{player.Name} sent this:\n{data}";
+                    break;
             }
 
             Console.WriteLine(message);

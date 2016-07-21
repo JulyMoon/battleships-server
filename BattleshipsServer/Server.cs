@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace BattleshipsServer
 {
@@ -39,10 +35,11 @@ namespace BattleshipsServer
 
         private void HandlePlayer(Player player)
         {
-            var reader = new BinaryReader(player.Client.GetStream());
             while (true)
-                ParseTraffic(player, reader.ReadString());
+                ParseTraffic(player, player.Reader.ReadString());
         }
+
+        private Player Other(Player player) => players.Find(a => !a.Equals(player));
 
         private void ParseTraffic(Player player, string data)
         {
@@ -60,11 +57,12 @@ namespace BattleshipsServer
                 case "name":
                     player.Name = data;
                     message = $"{player.Name} has joined the game.";
+                    NotifyOtherThatOpponentFound(player);
                     break;
 
-                case "message":
-                    message = $"{player.Name}: {data}";
-                    break;
+                //case "message":
+                //    message = $"{player.Name}: {data}";
+                //    break;
 
                 default: //throw new ArgumentException("Invalid data");
                     message = $"{player.Name} sent this:\n{data}";
@@ -73,6 +71,12 @@ namespace BattleshipsServer
 
             Console.WriteLine(message);
             // todo
+        }
+
+        private void NotifyOtherThatOpponentFound(Player player)
+        {
+            if (players.Count > 1)
+                Other(player).Writer.Write("opponentFound");
         }
     }
 }

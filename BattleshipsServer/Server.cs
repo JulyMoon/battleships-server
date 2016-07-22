@@ -39,44 +39,43 @@ namespace BattleshipsServer
                 ParseTraffic(player, player.Reader.ReadString());
         }
 
-        private Player Other(Player player) => players.Find(a => !a.Equals(player));
+        private Player OpponentOf(Player player) => players.Find(a => !a.Equals(player));
 
-        private void ParseTraffic(Player player, string data)
+        private void ParseTraffic(Player player, string traffic)
         {
-            int separatorIndex = data.IndexOf(":", StringComparison.Ordinal);
+            int separatorIndex = traffic.IndexOf(":", StringComparison.Ordinal);
 
             if (separatorIndex == -1)
-                throw new ArgumentException("Invalid data");
+            {
+                Console.WriteLine($"{player.NameWithId} sent a packet without a header:\n{traffic}");
+                return;
+            }
 
-            string header = data.Substring(0, separatorIndex);
-            data = data.Substring(separatorIndex + 1);
-
-            string message;
+            string header = traffic.Substring(0, separatorIndex);
+            string data = traffic.Substring(separatorIndex + 1);
+            
             switch (header)
             {
                 case "name":
                     player.Name = data;
-                    message = $"{player.Name} has joined the game.";
+                    Console.WriteLine($"{player.NameWithId} has joined the game.");
                     NotifyOtherThatOpponentFound(player);
                     break;
 
-                //case "message":
-                //    message = $"{player.Name}: {data}";
-                //    break;
-
-                default: //throw new ArgumentException("Invalid data");
-                    message = $"{player.Name} sent this:\n{data}";
+                default:
+                    Console.WriteLine($"{player.NameWithId} sent this:\n{data}");
                     break;
             }
-
-            Console.WriteLine(message);
-            // todo
         }
 
         private void NotifyOtherThatOpponentFound(Player player)
         {
-            if (players.Count > 1)
-                Other(player).Writer.Write("opponentFound");
+            if (players.Count <= 1)
+                return;
+
+            var other = OpponentOf(player);
+            other.Writer.Write("opponentFound");
+            Console.WriteLine($"Sent \"opponentFound\" to {other.NameWithId}");
         }
     }
 }

@@ -58,24 +58,46 @@ namespace BattleshipsServer
             {
                 case "name":
                     player.Name = data;
-                    Console.WriteLine($"{player.NameWithId} has joined the game.");
-                    NotifyOtherThatOpponentFound(player);
+                    Console.WriteLine($"{player.NameWithId} has connected to the server.");
+                    break;
+
+                case "enter":
+                    Console.WriteLine($"{player.NameWithId} has entered matchmaking.");
+                    player.InMatchmaking = true;
+                    player.Ships = data;
+
+                    if (players.Count < 2)
+                        break;
+
+                    var opponent = OpponentOf(player);
+                    if (!opponent.InMatchmaking)
+                        break;
+
+                    player.InMatchmaking = false;
+                    opponent.InMatchmaking = false;
+
+                    Console.WriteLine($"GAME STARTS: {player.NameWithId} vs {opponent.NameWithId}");
+
+                    NotifyThatOpponentFound(player);
+                    NotifyThatOpponentFound(opponent);
+                    break;
+
+                case "leave":
+                    Console.WriteLine($"{player.NameWithId} has left matchmaking.");
+                    player.InMatchmaking = false;
                     break;
 
                 default:
-                    Console.WriteLine($"{player.NameWithId} sent this:\n{data}");
+                    Console.WriteLine($"{player.NameWithId} sent this:\n{traffic}");
                     break;
             }
         }
 
-        private void NotifyOtherThatOpponentFound(Player player)
+        private static void NotifyThatOpponentFound(Player player)
         {
-            if (players.Count <= 1)
-                return;
-
-            var other = OpponentOf(player);
-            other.Writer.Write("opponentFound");
-            Console.WriteLine($"Sent \"opponentFound\" to {other.NameWithId}");
+            const string opponentFound = "opponentFound";
+            player.Writer.Write(opponentFound);
+            Console.WriteLine($"Sent \"{opponentFound}\" to {player.NameWithId}");
         }
     }
 }

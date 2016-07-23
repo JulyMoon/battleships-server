@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.IO;
 using System.Net.Sockets;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BattleshipsServer
 {
@@ -15,6 +10,9 @@ namespace BattleshipsServer
         public readonly BinaryWriter Writer;
         public string Name;
         public readonly int Id;
+        public bool InMatchmaking = false;
+        public string Ships;
+
         private static int id = 1;
 
         public string NameWithId => $"{Name} [{Id}]";

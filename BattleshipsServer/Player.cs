@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Net.Sockets;
 
 namespace BattleshipsServer
@@ -26,6 +27,16 @@ namespace BattleshipsServer
             Writer = new BinaryWriter(stream);
         }
 
-        public bool Equals(Player player) => Client == player?.Client;
+        //public bool Equals(Player player) => Id == player?.Id;
+
+        private void Send(string text)
+        {
+            Writer.Write(text);
+            Console.WriteLine($"Sent \"{text}\" to {NameWithId}");
+        } 
+
+        public void NotifyYourTurn() => Send("yourTurn");
+
+        public void NotifyOpponentsTurn() => Send("opponentsTurn");
     }
 }

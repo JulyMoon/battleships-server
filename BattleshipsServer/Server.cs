@@ -11,6 +11,7 @@ namespace BattleshipsServer
         public const int Port = 7070;
 
         private readonly List<Player> players = new List<Player>();
+        private Dictionary<Player, Match> matches = new Dictionary<Player, Match>();
 
         public async void Start()
         {
@@ -76,8 +77,9 @@ namespace BattleshipsServer
 
                     Console.WriteLine($"GAME STARTS: {player.NameWithId} vs {opponent.NameWithId}");
 
-                    NotifyThatOpponentFound(player);
-                    NotifyThatOpponentFound(opponent);
+                    var match = new Match(player, opponent);
+                    matches.Add(player, match);
+                    matches.Add(opponent, match);
                     break;
 
                 case "leave":
@@ -89,13 +91,6 @@ namespace BattleshipsServer
                     Console.WriteLine($"{player.NameWithId} sent this:\n{traffic}");
                     break;
             }
-        }
-
-        private static void NotifyThatOpponentFound(Player player)
-        {
-            const string opponentFound = "opponentFound";
-            player.Writer.Write(opponentFound);
-            Console.WriteLine($"Sent \"{opponentFound}\" to {player.NameWithId}");
         }
     }
 }

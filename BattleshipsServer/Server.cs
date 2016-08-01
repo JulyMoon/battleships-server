@@ -11,7 +11,7 @@ namespace BattleshipsServer
         public const int Port = 7070;
 
         private readonly List<Player> players = new List<Player>();
-        private Dictionary<Player, Match> matches = new Dictionary<Player, Match>();
+        private readonly List<Match> matches = new List<Match>();
 
         public async void Start()
         {
@@ -77,9 +77,7 @@ namespace BattleshipsServer
 
                     Console.WriteLine($"GAME STARTS: {player.NameWithId} vs {opponent.NameWithId}");
 
-                    var match = new Match(player, opponent);
-                    matches.Add(player, match);
-                    matches.Add(opponent, match);
+                    matches.Add(new Match(player, opponent));
                     break;
 
                 case "leave":

@@ -12,13 +12,11 @@ namespace BattleshipsServer
 
         private readonly List<Player> players = new List<Player>();
 
-        public void Start() => StartListening();
-
-        private async void StartListening()
+        public async void Start()
         {
             var listener = new TcpListener(IPAddress.Any, Port);
             listener.Start();
-            Console.WriteLine("Listening...");
+            Console.WriteLine("Waiting for players...");
             while (true)
             {
                 var client = await listener.AcceptTcpClientAsync().ConfigureAwait(false);

@@ -18,8 +18,6 @@ namespace BattleshipsServer
             Player1 = player1;
             Player2 = player2;
 
-            // todo: add overlap/bounds check here
-
             Turn = random.Next(2) == 0;
 
             Attacker.NotifyYourTurn();
@@ -37,8 +35,21 @@ namespace BattleshipsServer
             }
 
             if (!Battleships.WithinBoard(x, y))
-            {
                 throw new Exception("You shootin' outside of board?");
+
+            int index, segment;
+            if (Battleships.GetShotShipSegment(Defender.Ships, x, y, out index, out segment))
+            {
+                Defender.Ships[index].IsAlive[segment] = false;
+
+                Attacker.NotifyYouHit();
+                Defender.NotifyOpponentHit();
+            }
+            else
+            {
+                Attacker.NotifyYouMissed();
+                Defender.NotifyOpponentMissed();
+                Turn = !Turn;
             }
         }
     }

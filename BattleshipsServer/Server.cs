@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
@@ -61,9 +62,14 @@ namespace BattleshipsServer
                     break;
 
                 case "enter":
-                    Console.WriteLine($"{player.NameWithId} has entered matchmaking.");
+                    var shipPropArray = ShipProperties.DeserializeList(data);
+
+                    //todo: add overlap/bounds check here
+
+                    player.Ships = shipPropArray.Select(shipProps => new Ship(shipProps)).ToList();
+                    
                     player.InMatchmaking = true;
-                    player.Ships = data;
+                    Console.WriteLine($"{player.NameWithId} has entered matchmaking.");
 
                     if (players.Count < 2)
                         break;
@@ -83,6 +89,17 @@ namespace BattleshipsServer
                 case "leave":
                     Console.WriteLine($"{player.NameWithId} has left matchmaking.");
                     player.InMatchmaking = false;
+                    break;
+
+                case "shoot":
+                    var split = data.Split('\'');
+                    int x = Int32.Parse(split[0]);
+                    int y = Int32.Parse(split[1]);
+
+                    var match = matches.Find(m => m.Player1 == player || m.Player2 == player);
+                    match.Shoot(player, x, y);
+
+                    Console.WriteLine($"{player.NameWithId} just shot {(player == match.Player1 ? match.Player2 : match.Player1).NameWithId} at ({x}, {y})");
                     break;
 
                 default:

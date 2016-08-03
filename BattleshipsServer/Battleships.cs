@@ -77,5 +77,35 @@ namespace BattleshipsServer
 
             return false;
         }
+
+        public static bool GetShotShipSegment(List<Ship> ships, int x, int y, out int index, out int segment)
+        {
+            for (int i = 0; i < ships.Count; i++)
+                for (int j = 0; j < ships[i].Size; j++)
+                {
+                    int xx, yy;
+                    if (ships[i].IsVertical)
+                    {
+                        xx = ships[i].X;
+                        yy = ships[i].Y + j;
+                    }
+                    else
+                    {
+                        xx = ships[i].X + j;
+                        yy = ships[i].Y;
+                    }
+
+                    if (x != xx || y != yy)
+                        continue;
+
+                    index = i;
+                    segment = j;
+                    return true;
+                }
+
+            index = -1;
+            segment = -1;
+            return false;
+        }
     }
 }

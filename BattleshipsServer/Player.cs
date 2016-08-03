@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net.Sockets;
 
@@ -12,7 +13,7 @@ namespace BattleshipsServer
         public string Name;
         public readonly int Id;
         public bool InMatchmaking = false;
-        public string Ships;
+        public List<Ship> Ships;
 
         private static int id = 1;
 
@@ -38,5 +39,13 @@ namespace BattleshipsServer
         public void NotifyYourTurn() => Send("yourTurn");
 
         public void NotifyOpponentsTurn() => Send("opponentsTurn");
+
+        public void NotifyYouMissed() => Send("youMissed");
+
+        public void NotifyYouHit() => Send("youHit");
+
+        public void NotifyOpponentMissed() => Send("opponentMissed");
+
+        public void NotifyOpponentHit() => Send("opponentHit");
     }
 }

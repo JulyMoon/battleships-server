@@ -1,4 +1,5 @@
 ﻿using System;
+using BattleshipsCommon;
 
 namespace BattleshipsServer
 {
@@ -34,11 +35,11 @@ namespace BattleshipsServer
                 throw new Exception("WTF? This player isn't from this match");
             }
 
-            if (!Battleships.WithinBoard(x, y))
+            if (!Game.WithinBoard(x, y))
                 throw new Exception("You shootin' outside of board?");
             
             int index, segment;
-            bool hit = Battleships.GetShotShipSegment(Defender.Ships, x, y, out index, out segment);
+            bool hit = Game.GetShotShipSegment(Defender.Ships, x, y, out index, out segment);
             if (hit)
             {
                 Defender.Ships[index].IsAlive[segment] = false;

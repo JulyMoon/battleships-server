@@ -8,9 +8,9 @@ namespace BattleshipsServer
 {
     public class Player
     {
-        public readonly TcpClient Client;
-        public readonly BinaryReader Reader;
-        public readonly BinaryWriter Writer;
+        private readonly TcpClient client;
+        private readonly BinaryReader reader;
+        private readonly BinaryWriter writer;
         public string Name;
         public readonly int Id;
         public bool InMatchmaking = false;
@@ -23,19 +23,21 @@ namespace BattleshipsServer
         public Player(TcpClient client)
         {
             Id = id++;
-            Client = client;
+            this.client = client;
             var stream = client.GetStream();
-            Reader = new BinaryReader(stream);
-            Writer = new BinaryWriter(stream);
+            reader = new BinaryReader(stream);
+            writer = new BinaryWriter(stream);
         }
 
         //public bool Equals(Player player) => Id == player?.Id;
 
         private void Send(string text)
         {
-            Writer.Write(text);
+            writer.Write(text);
             Console.WriteLine($"Sent \"{text}\" to {NameWithId}");
-        } 
+        }
+
+        public string ReadTraffic() => reader.ReadString();
 
         public void NotifyYourTurn() => Send("yourTurn");
 

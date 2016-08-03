@@ -37,7 +37,7 @@ namespace BattleshipsServer
         private void HandlePlayer(Player player)
         {
             while (true)
-                ParseTraffic(player, player.Reader.ReadString());
+                ParseTraffic(player, player.ReadTraffic());
         }
 
         private Player OpponentOf(Player player) => players.Find(a => !a.Equals(player));

@@ -98,8 +98,6 @@ namespace BattleshipsServer
 
                     var match = matches.Find(m => m.Player1 == player || m.Player2 == player);
                     match.Shoot(player, x, y);
-
-                    Console.WriteLine($"{player.NameWithId} just shot {(player == match.Player1 ? match.Player2 : match.Player1).NameWithId} at ({x}, {y})");
                     break;
 
                 default:

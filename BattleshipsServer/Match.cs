@@ -36,21 +36,24 @@ namespace BattleshipsServer
 
             if (!Battleships.WithinBoard(x, y))
                 throw new Exception("You shootin' outside of board?");
-
+            
             int index, segment;
-            if (Battleships.GetShotShipSegment(Defender.Ships, x, y, out index, out segment))
+            bool hit = Battleships.GetShotShipSegment(Defender.Ships, x, y, out index, out segment);
+            if (hit)
             {
                 Defender.Ships[index].IsAlive[segment] = false;
 
                 Attacker.NotifyYouHit();
-                Defender.NotifyOpponentHit();
+                Defender.NotifyOpponentHit(x, y);
             }
             else
             {
                 Attacker.NotifyYouMissed();
-                Defender.NotifyOpponentMissed();
+                Defender.NotifyOpponentMissed(x, y);
                 Turn = !Turn;
             }
+
+            Console.WriteLine($"{Attacker.NameWithId} just {(hit ? "hit" : "missed")} {Defender.NameWithId} at ({x}, {y})");
         }
     }
 }

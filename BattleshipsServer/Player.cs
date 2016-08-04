@@ -34,7 +34,7 @@ namespace BattleshipsServer
         private void Send(string text)
         {
             writer.Write(text);
-            Console.WriteLine($"Sent \"{text}\" to {NameWithId}");
+            //Console.WriteLine($"Sent \"{text}\" to {NameWithId}");
         }
 
         public string ReadTraffic() => reader.ReadString();

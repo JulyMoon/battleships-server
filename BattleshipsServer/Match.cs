@@ -43,17 +43,30 @@ namespace BattleshipsServer
             if (hit)
             {
                 Defender.Ships[index].IsAlive[segment] = false;
-                Attacker.NotifyYouHit();
+
+                if (Defender.Ships[index].Dead)
+                    Attacker.NotifyYouSank();
+                else
+                    Attacker.NotifyYouHit();
             }
             else
             {
                 Attacker.NotifyYouMissed();
-                Turn = !Turn;
             }
 
             Defender.NotifyOpponentShot(x, y);
 
-            Console.WriteLine($"{Attacker.NameWithId} just {(hit ? "hit" : "missed")} {Defender.NameWithId} at ({x}, {y})");
+            if (hit)
+            {
+                Console.WriteLine(Defender.Ships[index].Dead
+                    ? $"{Attacker.NameWithId} just sank {Defender.NameWithId}'s ship at ({x}, {y})"
+                    : $"{Attacker.NameWithId} just hit {Defender.NameWithId} at ({x}, {y})");
+            }
+            else
+            {
+                Console.WriteLine($"{Attacker.NameWithId} just missed {Defender.NameWithId} at ({x}, {y})");
+                Turn = !Turn;
+            }
         }
     }
 }

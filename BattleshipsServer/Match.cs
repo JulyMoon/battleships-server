@@ -43,16 +43,15 @@ namespace BattleshipsServer
             if (hit)
             {
                 Defender.Ships[index].IsAlive[segment] = false;
-
                 Attacker.NotifyYouHit();
-                Defender.NotifyOpponentHit(x, y);
             }
             else
             {
                 Attacker.NotifyYouMissed();
-                Defender.NotifyOpponentMissed(x, y);
                 Turn = !Turn;
             }
+
+            Defender.NotifyOpponentShot(x, y);
 
             Console.WriteLine($"{Attacker.NameWithId} just {(hit ? "hit" : "missed")} {Defender.NameWithId} at ({x}, {y})");
         }

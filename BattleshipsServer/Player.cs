@@ -47,8 +47,6 @@ namespace BattleshipsServer
 
         public void NotifyYouHit() => Send("youHit");
 
-        public void NotifyOpponentMissed(int x, int y) => Send($"opponentMissed:{x}'{y}");
-
-        public void NotifyOpponentHit(int x, int y) => Send($"opponentHit:{x}'{y}");
+        public void NotifyOpponentShot(int x, int y) => Send($"opponentShot:{x}'{y}");
     }
 }

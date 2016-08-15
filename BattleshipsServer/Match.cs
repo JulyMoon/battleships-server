@@ -61,6 +61,9 @@ namespace BattleshipsServer
                 Console.WriteLine(Defender.Ships[index].Dead
                     ? $"{Attacker.NameWithId} just sank {Defender.NameWithId}'s ship at ({x}, {y})"
                     : $"{Attacker.NameWithId} just hit {Defender.NameWithId} at ({x}, {y})");
+
+                if (Defender.Ships.TrueForAll(ship => ship.Dead))
+                    Console.WriteLine($"GAME OVER | WINNER: {Attacker.NameWithId} | LOSER: {Defender.NameWithId}");
             }
             else
             {

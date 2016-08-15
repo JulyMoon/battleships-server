@@ -29,8 +29,6 @@ namespace BattleshipsServer
             writer = new BinaryWriter(stream);
         }
 
-        //public bool Equals(Player player) => Id == player?.Id;
-
         private void Send(string text)
         {
             writer.Write(text);

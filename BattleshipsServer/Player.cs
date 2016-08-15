@@ -37,16 +37,16 @@ namespace BattleshipsServer
 
         public string ReadTraffic() => reader.ReadString();
 
-        public void NotifyYourTurn() => Send("yourTurn");
+        public void SendYourTurn() => Send(Game.YourTurnString);
 
-        public void NotifyOpponentsTurn() => Send("opponentsTurn");
+        public void SendOpponentsTurn() => Send(Game.OpponentsTurnString);
 
-        public void NotifyYouMissed() => Send("youMissed");
+        public void SendYouMissed() => Send(Game.YouMissedString);
 
-        public void NotifyYouHit() => Send("youHit");
+        public void SendYouHit() => Send(Game.YouHitString);
 
-        public void NotifyYouSank() => Send("youSank");
+        public void SendYouSank() => Send(Game.YouSankString);
 
-        public void NotifyOpponentShot(int x, int y) => Send($"opponentShot:{x}'{y}");
+        public void SendOpponentShot(int x, int y) => Send($"{Game.OpponentShotString}:{x}'{y}");
     }
 }

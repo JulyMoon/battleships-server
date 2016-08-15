@@ -21,8 +21,8 @@ namespace BattleshipsServer
 
             Turn = random.Next(2) == 0;
 
-            Attacker.NotifyYourTurn();
-            Defender.NotifyOpponentsTurn();
+            Attacker.SendYourTurn();
+            Defender.SendOpponentsTurn();
         }
 
         public void Shoot(Player player, int x, int y)
@@ -45,16 +45,16 @@ namespace BattleshipsServer
                 Defender.Ships[index].IsAlive[segment] = false;
 
                 if (Defender.Ships[index].Dead)
-                    Attacker.NotifyYouSank();
+                    Attacker.SendYouSank();
                 else
-                    Attacker.NotifyYouHit();
+                    Attacker.SendYouHit();
             }
             else
             {
-                Attacker.NotifyYouMissed();
+                Attacker.SendYouMissed();
             }
 
-            Defender.NotifyOpponentShot(x, y);
+            Defender.SendOpponentShot(x, y);
 
             if (hit)
             {

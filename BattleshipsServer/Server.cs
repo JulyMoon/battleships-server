@@ -57,12 +57,12 @@ namespace BattleshipsServer
             
             switch (header)
             {
-                case "name":
+                case Game.NameString:
                     player.Name = data;
                     Console.WriteLine($"{player.NameWithId} has connected to the server.");
                     break;
 
-                case "enter":
+                case Game.EnterString:
                     var shipPropArray = ShipProperties.DeserializeList(data);
 
                     //todo: add overlap/bounds check here
@@ -87,12 +87,12 @@ namespace BattleshipsServer
                     matches.Add(new Match(player, opponent));
                     break;
 
-                case "leave":
+                case Game.LeaveString:
                     Console.WriteLine($"{player.NameWithId} has left matchmaking.");
                     player.InMatchmaking = false;
                     break;
 
-                case "shoot":
+                case Game.ShootString:
                     var split = data.Split('\'');
                     int x = Int32.Parse(split[0]);
                     int y = Int32.Parse(split[1]);

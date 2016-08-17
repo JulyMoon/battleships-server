@@ -40,7 +40,7 @@ namespace BattleshipsServer
                 ParseTraffic(player, player.ReadTraffic());
         }
 
-        private Player OpponentOf(Player player) => players.Find(a => !a.Equals(player));
+        private Player OpponentOf(Player player) => players.Find(a => a != player);
 
         private void ParseTraffic(Player player, string traffic)
         {
@@ -65,22 +65,22 @@ namespace BattleshipsServer
                 case Game.EnterString:
                     var shipPropArray = ShipProperties.DeserializeList(data);
 
-                    //todo: add overlap/bounds check here
+                    // todo: add overlap/bounds check here
 
                     player.Ships = shipPropArray.Select(shipProps => new Ship(shipProps)).ToList();
                     
-                    player.InMatchmaking = true;
+                    player.Status = Player.State.InMatchmaking;
                     Console.WriteLine($"{player.NameWithId} has entered matchmaking.");
 
                     if (players.Count < 2)
                         break;
 
                     var opponent = OpponentOf(player);
-                    if (!opponent.InMatchmaking)
+                    if (opponent.Status != Player.State.InMatchmaking)
                         break;
 
-                    player.InMatchmaking = false;
-                    opponent.InMatchmaking = false;
+                    player.Status = Player.State.InGame;
+                    opponent.Status = Player.State.InGame;
 
                     Console.WriteLine($"GAME STARTS: {player.NameWithId} vs {opponent.NameWithId}");
 
@@ -88,8 +88,13 @@ namespace BattleshipsServer
                     break;
 
                 case Game.LeaveString:
-                    Console.WriteLine($"{player.NameWithId} has left matchmaking.");
-                    player.InMatchmaking = false;
+                    if (player.Status == Player.State.InMatchmaking)
+                    {
+                        Console.WriteLine($"{player.NameWithId} has left matchmaking.");
+                        player.Status = Player.State.Available;
+                    }
+                    else
+                        throw new Exception("Player tries to leave matchmaking while not in it");
                     break;
 
                 case Game.ShootString:
@@ -97,7 +102,7 @@ namespace BattleshipsServer
                     int x = Int32.Parse(split[0]);
                     int y = Int32.Parse(split[1]);
 
-                    var match = matches.Find(m => m.Player1 == player || m.Player2 == player);
+                    var match = matches.Find(m => !m.Over && (m.Player1 == player || m.Player2 == player));
                     match.Shoot(player, x, y);
                     break;
 

@@ -8,12 +8,14 @@ namespace BattleshipsServer
 {
     public class Player
     {
+        public enum State { Available, InMatchmaking, InGame }
+
         private readonly TcpClient client;
         private readonly BinaryReader reader;
         private readonly BinaryWriter writer;
         public string Name;
         public readonly int Id;
-        public bool InMatchmaking = false;
+        public State Status = State.Available;
         public List<Ship> Ships;
 
         private static int id = 1;

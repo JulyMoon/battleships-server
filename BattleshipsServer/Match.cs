@@ -9,8 +9,12 @@ namespace BattleshipsServer
         public Player Player2 { get; }
         public bool Turn { get; private set; }
 
-        private Player Attacker => Turn ? Player1 : Player2;
-        private Player Defender => Turn ? Player2 : Player1;
+        public bool Over { get; private set; }
+        public Player Winner { get; private set; }
+        public Player Loser { get; private set; }
+
+        private Player attacker => Turn ? Player1 : Player2;
+        private Player defender => Turn ? Player2 : Player1;
 
         private static readonly Random random = new Random();
 
@@ -21,15 +25,18 @@ namespace BattleshipsServer
 
             Turn = random.Next(2) == 0;
 
-            Attacker.SendYourTurn();
-            Defender.SendOpponentsTurn();
+            attacker.SendYourTurn();
+            defender.SendOpponentsTurn();
         }
 
         public void Shoot(Player player, int x, int y)
         {
-            if (player != Attacker)
+            if (Over)
+                throw new Exception("Yo wtf this game is already over");
+
+            if (player != attacker)
             {
-                if (player == Defender)
+                if (player == defender)
                     throw new Exception("Defender tried to attack. Lol.");
 
                 throw new Exception("WTF? This player isn't from this match");
@@ -39,35 +46,42 @@ namespace BattleshipsServer
                 throw new Exception("You shootin' outside of board?");
             
             int index, segment;
-            bool hit = Game.GetShotShipSegment(Defender.Ships, x, y, out index, out segment);
+            bool hit = Game.GetShotShipSegment(defender.Ships, x, y, out index, out segment);
             if (hit)
             {
-                Defender.Ships[index].IsAlive[segment] = false;
+                defender.Ships[index].IsAlive[segment] = false;
 
-                if (Defender.Ships[index].Dead)
-                    Attacker.SendYouSank();
+                if (defender.Ships[index].Dead)
+                    attacker.SendYouSank();
                 else
-                    Attacker.SendYouHit();
+                    attacker.SendYouHit();
             }
             else
             {
-                Attacker.SendYouMissed();
+                attacker.SendYouMissed();
             }
 
-            Defender.SendOpponentShot(x, y);
+            defender.SendOpponentShot(x, y);
 
             if (hit)
             {
-                Console.WriteLine(Defender.Ships[index].Dead
-                    ? $"{Attacker.NameWithId} just sank {Defender.NameWithId}'s ship at ({x}, {y})"
-                    : $"{Attacker.NameWithId} just hit {Defender.NameWithId} at ({x}, {y})");
+                Console.WriteLine(defender.Ships[index].Dead
+                    ? $"{attacker.NameWithId} just sank {defender.NameWithId}'s ship at ({x}, {y})"
+                    : $"{attacker.NameWithId} just hit {defender.NameWithId} at ({x}, {y})");
 
-                if (Defender.Ships.TrueForAll(ship => ship.Dead))
-                    Console.WriteLine($"GAME OVER | WINNER: {Attacker.NameWithId} | LOSER: {Defender.NameWithId}");
+                if (defender.Ships.TrueForAll(ship => ship.Dead))
+                {
+                    Over = true;
+                    Player1.Status = Player.State.Available;
+                    Player2.Status = Player.State.Available;
+                    Winner = attacker;
+                    Loser = defender;
+                    Console.WriteLine($"GAME OVER | WINNER: {attacker.NameWithId} | LOSER: {defender.NameWithId}");
+                }
             }
             else
             {
-                Console.WriteLine($"{Attacker.NameWithId} just missed {Defender.NameWithId} at ({x}, {y})");
+                Console.WriteLine($"{attacker.NameWithId} just missed {defender.NameWithId} at ({x}, {y})");
                 Turn = !Turn;
             }
         }

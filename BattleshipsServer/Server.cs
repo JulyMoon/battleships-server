@@ -42,6 +42,26 @@ namespace BattleshipsServer
 
         private Player OpponentOf(Player player) => players.Find(a => a != player);
 
+        private static bool IsValid(List<ShipProperties> ships)
+        {
+            if (!ships.Select(ship => ship.Size).OrderBy(size => size).SequenceEqual(Game.ShipSet.OrderBy(size => size)))
+                return false;
+
+            if (ships.Any(ship => !Game.WithinBoard(ship)))
+                return false;
+
+            var correctShips = new List<ShipProperties>();
+            foreach (var ship in ships)
+            {
+                if (Game.Overlaps(correctShips, ship))
+                    return false;
+
+                correctShips.Add(ship);
+            }
+
+            return true;
+        }
+
         private void ParseTraffic(Player player, string traffic)
         {
             int separatorIndex = traffic.IndexOf(":", StringComparison.Ordinal);
@@ -65,7 +85,8 @@ namespace BattleshipsServer
                 case Game.EnterString:
                     var shipPropArray = ShipProperties.DeserializeList(data);
 
-                    // todo: add overlap/bounds check here
+                    if (!IsValid(shipPropArray))
+                        throw new Exception("Wrong ship set bruh");
 
                     player.Ships = shipPropArray.Select(shipProps => new Ship(shipProps)).ToList();
                     

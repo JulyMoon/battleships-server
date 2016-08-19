@@ -18,6 +18,8 @@ namespace BattleshipsServer
         public State Status = State.Available;
         public List<Ship> Ships;
 
+        //public bool ClientConnected => client.Connected;
+
         private static int id = 1;
 
         public string NameWithId => $"{Name} [{Id}]";
@@ -36,6 +38,8 @@ namespace BattleshipsServer
             writer.Write(text);
             //Console.WriteLine($"Sent \"{text}\" to {NameWithId}");
         }
+
+        public void CloseConnection() => client.Close();
 
         public string ReadTraffic() => reader.ReadString();
 

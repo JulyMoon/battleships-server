@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -37,7 +38,22 @@ namespace BattleshipsServer
         private void HandlePlayer(Player player)
         {
             while (true)
-                ParseTraffic(player, player.ReadTraffic());
+            {
+                try
+                {
+                    ParseTraffic(player, player.ReadTraffic());
+                }
+                catch (IOException)
+                {
+                    player.CloseConnection();
+                    break;
+                }
+            }
+
+            Console.WriteLine($"{player.NameWithId} has disconnected from the server");
+
+            // todo: tell others that this player dc'd
+            players.Remove(player);
         }
 
         private Player OpponentOf(Player player) => players.Find(a => a != player);
@@ -66,20 +82,23 @@ namespace BattleshipsServer
         {
             int separatorIndex = traffic.IndexOf(":", StringComparison.Ordinal);
 
+            string header, data;
             if (separatorIndex == -1)
             {
-                Console.WriteLine($"{player.NameWithId} sent a packet without a header:\n{traffic}");
-                return;
+                header = traffic;
+                data = null;
             }
-
-            string header = traffic.Substring(0, separatorIndex);
-            string data = traffic.Substring(separatorIndex + 1);
+            else
+            {
+                header = traffic.Substring(0, separatorIndex);
+                data = traffic.Substring(separatorIndex + 1);
+            }
             
             switch (header)
             {
                 case Game.NameString:
                     player.Name = data;
-                    Console.WriteLine($"{player.NameWithId} has connected to the server.");
+                    Console.WriteLine($"{player.NameWithId} has connected to the server");
                     break;
 
                 case Game.EnterString:
@@ -91,7 +110,7 @@ namespace BattleshipsServer
                     player.Ships = shipPropArray.Select(shipProps => new Ship(shipProps)).ToList();
                     
                     player.Status = Player.State.InMatchmaking;
-                    Console.WriteLine($"{player.NameWithId} has entered matchmaking.");
+                    Console.WriteLine($"{player.NameWithId} has entered matchmaking");
 
                     if (players.Count < 2)
                         break;
@@ -111,7 +130,7 @@ namespace BattleshipsServer
                 case Game.LeaveString:
                     if (player.Status == Player.State.InMatchmaking)
                     {
-                        Console.WriteLine($"{player.NameWithId} has left matchmaking.");
+                        Console.WriteLine($"{player.NameWithId} has left matchmaking");
                         player.Status = Player.State.Available;
                     }
                     else

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Net;
 
 namespace BattleshipsServer
 {
@@ -9,7 +8,7 @@ namespace BattleshipsServer
         {
             Console.Title = "Battleships Server";
             new Server().Start();
-            Console.Title += $" | IP: {new WebClient().DownloadString("http://icanhazip.com")}";
+            //Console.Title += $" | IP: {Game.ServerHostname}"; //{Game.ServerIP}";
 
             while (true)
                 Console.ReadLine();

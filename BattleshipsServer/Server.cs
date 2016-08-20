@@ -11,21 +11,19 @@ namespace BattleshipsServer
 {
     public class Server
     {
-        public const int Port = 7070;
-
         private readonly List<Player> players = new List<Player>();
         private readonly List<Match> matches = new List<Match>();
 
         public async void Start()
         {
-            var listener = new TcpListener(IPAddress.Any, Port);
+            var listener = new TcpListener(IPAddress.Any, Game.Port);
             listener.Start();
             Console.WriteLine("Waiting for players...");
             while (true)
             {
                 var client = await listener.AcceptTcpClientAsync().ConfigureAwait(false);
 
-                Console.WriteLine($"Connection from {client.Client.LocalEndPoint} accepted");
+                Console.WriteLine($"Connection from {(client.Client.LocalEndPoint as IPEndPoint).Address} accepted");
                 var player = new Player(client);
                 players.Add(player);
                 new Thread(() => HandlePlayer(player)).Start();

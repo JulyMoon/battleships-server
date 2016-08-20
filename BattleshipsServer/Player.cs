@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
 using System.Net.Sockets;
 using BattleshipsCommon;
 
@@ -17,6 +18,8 @@ namespace BattleshipsServer
         public readonly int Id;
         public State Status = State.Available;
         public List<Ship> Ships;
+        public IPAddress IP { get; private set; }
+        public DateTime InMatchmakingSince { get; private set; }
 
         //public bool ClientConnected => client.Connected;
 
@@ -31,7 +34,10 @@ namespace BattleshipsServer
             var stream = client.GetStream();
             reader = new BinaryReader(stream);
             writer = new BinaryWriter(stream);
+            IP = (client.Client.LocalEndPoint as IPEndPoint)?.Address;
         }
+
+        public void SaveMatchmakingEnteringTime() => InMatchmakingSince = DateTime.Now;
 
         private void Send(string text)
         {

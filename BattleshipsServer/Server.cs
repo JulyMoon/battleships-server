@@ -53,8 +53,6 @@ namespace BattleshipsServer
             Console.WriteLine($"{player.NameWithId} has disconnected from the server");
         }
 
-        private Player OpponentOf(Player player) => players.Find(a => a != player);
-
         private static bool AreValid(List<ShipProperties> ships)
         {
             if (!ships.Select(ship => ship.Size).OrderBy(size => size).SequenceEqual(Game.ShipSet.OrderBy(size => size)))
@@ -117,15 +115,14 @@ namespace BattleshipsServer
             player.Ships = shipPropArray.Select(shipProps => new Ship(shipProps)).ToList();
 
             player.Status = Player.State.InMatchmaking;
-            player.SaveMatchmakingEnteringTime();
             Console.WriteLine($"{player.NameWithId} has entered matchmaking");
 
-            if (players.Count < 2)
+            var opponentCandidates = players.Where(plr => plr.Status == Player.State.InMatchmaking && plr != player).ToList();
+
+            if (opponentCandidates.Count == 0)
                 return;
 
-            var opponent = OpponentOf(player);
-            if (opponent.Status != Player.State.InMatchmaking)
-                return;
+            var opponent = opponentCandidates[0];
 
             player.Status = Player.State.InGame;
             opponent.Status = Player.State.InGame;

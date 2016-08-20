@@ -19,7 +19,6 @@ namespace BattleshipsServer
         public State Status = State.Available;
         public List<Ship> Ships;
         public IPAddress IP { get; private set; }
-        public DateTime InMatchmakingSince { get; private set; }
 
         //public bool ClientConnected => client.Connected;
 
@@ -36,8 +35,6 @@ namespace BattleshipsServer
             writer = new BinaryWriter(stream);
             IP = (client.Client.LocalEndPoint as IPEndPoint)?.Address;
         }
-
-        public void SaveMatchmakingEnteringTime() => InMatchmakingSince = DateTime.Now;
 
         private void Send(string text)
         {
